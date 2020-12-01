@@ -9,7 +9,7 @@ bot = telebot.TeleBot(API_TOKEN)
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.send_message(message.chat.id, """Привет, я КулсториБот. Могу рассказать
-        тебе удивительные истории на выбранную тему""", reply_markup=gen_markup())
+тебе удивительные истории на выбранную тему""", reply_markup=gen_markup())
 
 # Handle '/help'
 @bot.message_handler(commands=['help'])
