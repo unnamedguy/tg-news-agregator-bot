@@ -6,16 +6,19 @@ API_TOKEN = '1436454776:AAGlRrnESJA4ih1yGia4fGy9EcsIwsIqB3w'
 bot = telebot.TeleBot(API_TOKEN)
 
 # Handle '/start' 
+# Welcome message
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.send_message(message.chat.id, """Привет, я КулсториБот. Могу рассказать
 тебе удивительные истории на выбранную тему""", reply_markup=gen_markup())
 
 # Handle '/help'
+# Commands list
 @bot.message_handler(commands=['help'])
 def help(message):
     bot.reply_to(message, '\n/start\n/change\n/help') 
 
+# Keyboard generation
 def gen_markup():
     markup = InlineKeyboardMarkup()
     #markup.row_width = 2
@@ -29,11 +32,12 @@ def gen_markup():
     markup.add(InlineKeyboardButton("Получить новости", callback_data="cb_getnews"))
     return markup
 
+# Creates keyboard on click
 @bot.message_handler(commands=['change'])
 def start_message2(message):
     bot.send_message(message.chat.id, 'Категории:', reply_markup=gen_markup())
 
-#Handles the
+# Handles buttons' clicks
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     if call.data == 'cb_society':
