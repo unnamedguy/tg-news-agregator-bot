@@ -1,4 +1,5 @@
 import telebot
+from Classifier import getEnNewsCategory
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 API_TOKEN = '1436454776:AAGlRrnESJA4ih1yGia4fGy9EcsIwsIqB3w'
