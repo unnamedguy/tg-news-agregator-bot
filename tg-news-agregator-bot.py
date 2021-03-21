@@ -30,15 +30,6 @@ category_add_msg = 'Category added!'
 category_rm_msg  = 'Category removed!'
 
 
-
-async def main():
-    url = 'https://t.me/BBCWorld'
-
-    channel = await client.get_entity(url)
-    await dump_all_messages(channel)
-
-
-
 # Handle '/start' 
 # Welcome message
 @bot.message_handler(commands=['start'])
