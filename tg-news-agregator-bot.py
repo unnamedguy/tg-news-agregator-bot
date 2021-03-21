@@ -1,12 +1,43 @@
 import telebot
+import configparser
+
 from Token import API_TOKEN
 from Classifier import get_en_news_category
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from telethon.sync import TelegramClient
+from telethon import events
+
 bot = telebot.TeleBot(API_TOKEN)
+
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+# Присваиваем значения внутренним переменным
+api_id   = config['Telegram']['api_id']
+api_hash = config['Telegram']['api_hash']
+username = config['Telegram']['username']
+
+client = TelegramClient(username, api_id, api_hash)
+client.start()
+
+@client.on(events.NewMessage(chats="", pattern='(?i)hello.+'))
+async def handler(event):
+    # Respond whenever someone says "Hello" and something else
+    await event.reply('Hey!')
 
 category_add_msg = 'Category added!'
 category_rm_msg  = 'Category removed!'
+
+
+
+async def main():
+    url = 'https://t.me/BBCWorld'
+
+    channel = await client.get_entity(url)
+    await dump_all_messages(channel)
+
+
 
 # Handle '/start' 
 # Welcome message
