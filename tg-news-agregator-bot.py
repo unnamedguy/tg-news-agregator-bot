@@ -34,16 +34,20 @@ category_rm_msg  = 'Category removed!'
 
 
 user_list = []
+id_list = []
 # Handle '/start' 
 # Welcome message
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.send_message(message.chat.id, "Hello! I'm CoolstoryBot.", reply_markup=gen_markup())
-    
-    #FIX (Need to account for one user sending multiple /start messages)
-    new_user = User(chat_id)
-    if new_user not in user_list:
+    bot.send_message(message.chat.id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", reply_markup=gen_markup())
+
+    #User initialization    
+    if message.chat.id not in id_list:
+        new_user = User(message.chat.id)
+        id_list.append(new_user.chat_id)
         user_list.append(new_user)
+    else:
+        bot.send_message(message.chat.id, "You have already started!")
     
 # Handle '/help'
 # Commands list
