@@ -3,10 +3,13 @@ import configparser
 
 from Token import API_TOKEN
 from Classifier import get_en_news_category
+from User import User
+
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from telethon.sync import TelegramClient
 from telethon import events
+
 
 bot = telebot.TeleBot(API_TOKEN)
 
@@ -30,11 +33,17 @@ category_add_msg = 'Category added!'
 category_rm_msg  = 'Category removed!'
 
 
+user_list = []
 # Handle '/start' 
 # Welcome message
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.send_message(message.chat.id, "Hello! I'm CoolstoryBot.", reply_markup=gen_markup())
+    
+    #FIX (Need to account for one user sending multiple /start messages)
+    new_user = User(chat_id)
+    if new_user not in user_list:
+        user_list.append(new_user)
     
 # Handle '/help'
 # Commands list
