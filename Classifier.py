@@ -2,7 +2,7 @@ import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 
-def getEnNewsCategory(headline):
+def get_en_news_category(headline):
     category_list = ["sport", "world", "us", "business", "health", "entertainment", "sci_tech"]
 
     docs_new = [headline]
