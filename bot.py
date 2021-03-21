@@ -1,9 +1,9 @@
 import telebot
 import configparser
 
-from Token import API_TOKEN
-from Classifier import get_en_news_category
-from User import User
+from token import API_TOKEN
+from classifier import get_en_news_category
+from user import User
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
