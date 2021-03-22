@@ -41,13 +41,7 @@ id_list = []
 def send_welcome(message):
     bot.send_message(message.chat.id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", reply_markup=gen_markup())
 
-    #User initialization    
-    if message.chat.id not in id_list:
-        new_user = User(message.chat.id)
-        id_list.append(new_user.chat_id)
-        user_list.append(new_user)
-    else:
-        bot.send_message(message.chat.id, "You have already started!")
+    
     
 # Handle '/help'
 # Commands list
@@ -77,18 +71,23 @@ def start_message2(message):
 # Handles buttons' clicks
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
-    category_list = []
+    #User initialization    
+    if call.message.chat.id not in id_list:
+        new_user = User(call.message.chat.id)
+        id_list.append(new_user.chat_id)
+        user_list.append(new_user)
+
     if call.data == 'cb_sport':
         markup = call.message.reply_markup
         status = ''
         if markup.keyboard[0][0].text[-1] == '✅':
             markup.keyboard[0][0].text = 'Sport'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[0][0].text = 'Sport ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
             
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -101,11 +100,11 @@ def callback_query(call):
         if markup.keyboard[0][1].text[-1] == '✅':
             markup.keyboard[0][1].text = 'World'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[0][1].text = 'World ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -118,11 +117,11 @@ def callback_query(call):
         if markup.keyboard[1][0].text[-1] == '✅':
             markup.keyboard[1][0].text = 'US'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[1][0].text = 'US ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -135,11 +134,11 @@ def callback_query(call):
         if markup.keyboard[1][1].text[-1] == '✅':
             markup.keyboard[1][1].text = 'Business'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[1][1].text = 'Business ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -152,11 +151,11 @@ def callback_query(call):
         if markup.keyboard[2][0].text[-1] == '✅':
             markup.keyboard[2][0].text = 'Health'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[2][0].text = 'Health ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -169,11 +168,11 @@ def callback_query(call):
         if markup.keyboard[2][1].text[-1] == '✅':
             markup.keyboard[2][1].text = 'Entertainment'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[2][1].text = 'Entertainment ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -186,11 +185,11 @@ def callback_query(call):
         if markup.keyboard[3][0].text[-1] == '✅':
             markup.keyboard[3][0].text = 'Science & Tech'
             status = category_rm_msg
-            category_list.remove(call.data[3:])
+            new_user.selected_categories.remove(call.data[3:])
         else:
             markup.keyboard[3][0].text = 'Science & Tech ✅'
             status = category_add_msg
-            category_list.append(call.data[3:])
+            new_user.selected_categories.append(call.data[3:])
 
         bot.edit_message_reply_markup(chat_id=call.message.chat.id, 
                                         message_id=call.message.id, 
@@ -199,7 +198,7 @@ def callback_query(call):
 
     else:
         bot.answer_callback_query(call.id, 'Got the news!')
-        #start_news_loop(category_list, call.message.chat.id)
+        #set the flag to 1
 
 
 #def start_news_loop(categories, chat_id):
