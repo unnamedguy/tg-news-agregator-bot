@@ -198,6 +198,11 @@ def callback_query(call):
 
     else:
         bot.answer_callback_query(call.id, 'Got the news!')
-
+        
+        #Add new user to the list
+        if call.message.chat.id not in id_list:
+            new_user.subscribed = True #start sending news
+            id_list.append(new_user.chat_id)
+            user_list.append(new_user)
 
 bot.polling(none_stop=True)
