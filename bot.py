@@ -3,15 +3,13 @@ import configparser
 
 from apitok import API_TOKEN
 from classifier import get_en_news_category
+from telethon.tl.functions.channels import JoinChannelRequest
 from user import User
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from telethon.sync import TelegramClient
 from telethon import events
-
-
-bot = telebot.TeleBot(API_TOKEN)
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -28,12 +26,18 @@ api_hash = config['Telegram']['api_hash']
 username = config['Telegram']['username']
 
 client = TelegramClient(username, api_id, api_hash)
-client.start()
 
-@client.on(events.NewMessage(chats="", pattern='(?i)hello.+'))
+
+bot = telebot.TeleBot(API_TOKEN)
+
+@client.on(events.NewMessage())
 async def handler(event):
     # Respond whenever someone says "Hello" and something else
-    await event.reply('Hey!')
+    await event.reply('aa')
+
+client.start()
+client.run_until_disconnected()
+
 
 
 # Handle '/start' 
