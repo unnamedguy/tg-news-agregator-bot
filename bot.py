@@ -1,7 +1,7 @@
 import telebot
 import configparser
 
-from token import API_TOKEN
+from apitok import API_TOKEN
 from classifier import get_en_news_category
 from user import User
 
