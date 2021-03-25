@@ -1,6 +1,10 @@
 # Config
 config.ini
 
+# Session files
+*.session
+*.session-journal
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
