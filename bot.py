@@ -8,8 +8,7 @@ from user import User
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from telethon.sync import TelegramClient
-from telethon import events
+from telethon import events, TelegramClient
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -25,19 +24,15 @@ api_id   = config['Telegram']['api_id']
 api_hash = config['Telegram']['api_hash']
 username = config['Telegram']['username']
 
-client = TelegramClient(username, api_id, api_hash)
+client = TelegramClient(username, api_id, api_hash).start()
 
+bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN)
 
-bot = telebot.TeleBot(API_TOKEN)
 
 @client.on(events.NewMessage())
 async def handler(event):
     # Respond whenever someone says "Hello" and something else
     await event.reply('aa')
-
-client.start()
-client.run_until_disconnected()
-
 
 
 # Handle '/start' 
@@ -210,3 +205,5 @@ def callback_query(call):
             user_list.append(new_user)
 
 bot.polling(none_stop=True)
+client.run_until_disconnected()
+bot.run_until_disconnected()        
