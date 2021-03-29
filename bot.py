@@ -29,9 +29,9 @@ client = TelegramClient(username, api_id, api_hash).start()
 
 bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN)
 
-@client.on(events.NewMessage)
-async def handler(event):
-    await event.reply('aa')
+# @client.on(events.NewMessage)
+# async def handler(event):
+#     await event.reply('aa')
 
 # Keyboard generation
 def create_keyboard():
