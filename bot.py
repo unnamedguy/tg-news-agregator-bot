@@ -56,11 +56,11 @@ async def send_welcome(event):
             cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')
             user_entry = cursor.fetchall()
             print(user_entry)
-            if user_entry==None:
+            if len(user_entry)==0:
                 cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,us, business, health, entertainment, sci_tech)\
                 VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
-            #else:
-               # print(user_entry)
+            else:
+               print(user_entry)
 
     await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard(event.chat_id))
 
