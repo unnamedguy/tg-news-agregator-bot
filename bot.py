@@ -6,8 +6,6 @@ from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.custom import Button
 from user import User
 
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 from telethon import events, TelegramClient
 
 config = configparser.ConfigParser()
