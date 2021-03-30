@@ -54,8 +54,7 @@ async def send_welcome(event):
                             us, business, health, entertainment, sci_tech)\
                             VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
 
-    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot.\
-          What kind of news would you like to receive?", buttons=create_keyboard())
+    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard())
 
 @bot.on(events.NewMessage(pattern='/categories'))
 async def send_categories(event):
