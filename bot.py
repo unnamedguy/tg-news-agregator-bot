@@ -24,11 +24,10 @@ username = config['Telegram']['username']
 client = TelegramClient(username, api_id, api_hash).start()
 
 bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN)
-
-# @client.on(events.NewMessage)
-# async def handler(event):
-#     await event.reply('aa')
-#'SELECT chat_id FROM bot_user WHERE {category} = TRUE'
+# -1001317428262
+@client.on(events.NewMessage(chats=[165878449]))
+async def handler(event):
+    await client.forward_messages(1436454776, event.message)
 
 # Keyboard generation
 def create_keyboard(chat_id):
