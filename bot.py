@@ -9,9 +9,9 @@ from user import User
 from telethon import events, TelegramClient
 from contextlib import closing
 
-conn = psycopg2.connect(dbname=DB_NAME, user=USER, 
-                        password=PASS, host=HOST)
-cursor = conn.cursor()
+# conn = psycopg2.connect(dbname=DB_NAME, user=USER, 
+#                         password=PASS, host=HOST)
+# cursor = conn.cursor()
 
 table = 'bot'
 config = configparser.ConfigParser()
@@ -48,11 +48,17 @@ def create_keyboard():
 # Welcome message
 @bot.on(events.NewMessage(pattern='/start'))
 async def send_welcome(event):
+    
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,\
-                            us, business, health, entertainment, sci_tech)\
-                            VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
+            conn.autocommit = True
+            if cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')=='None':
+                cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,us, business, health, entertainment, sci_tech)\
+                VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
+            else 
+
+                            
+
 
     await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard())
 
@@ -64,129 +70,132 @@ async def send_categories(event):
 # Handles buttons' clicks
 @bot.on(events.CallbackQuery)
 async def handler(event):
+    with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
+        with conn.cursor() as cursor:
+            conn.autocommit = True
     # User initialization
     # new_user = User(event.chat_id)
-    if event.data == b'cb_sport':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[0].buttons[0].text[-1] == '✅':
-            markup.rows[0].buttons[0].text = 'Sport'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[0].buttons[0].text = 'Sport ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
-        
-        await msg.edit(buttons=markup)
+            if event.data == b'cb_sport':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[0].buttons[0].text[-1] == '✅':
+                    markup.rows[0].buttons[0].text = 'Sport'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[0].buttons[0].text = 'Sport ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
+                
+                await msg.edit(buttons=markup)
 
-        await event.answer(status)    
+                await event.answer(status)    
 
-    elif event.data == b'cb_world':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[0].buttons[1].text[-1] == '✅':
-            markup.rows[0].buttons[1].text = 'World'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[0].buttons[1].text = 'World ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+            elif event.data == b'cb_world':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[0].buttons[1].text[-1] == '✅':
+                    markup.rows[0].buttons[1].text = 'World'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[0].buttons[1].text = 'World ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                                
-        await event.answer(status)  
+                await msg.edit(buttons=markup) 
+                                                                                        
+                await event.answer(status)  
 
-    elif event.data == b'cb_us':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[1].buttons[0].text[-1] == '✅':
-            markup.rows[1].buttons[0].text = 'US'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[1].buttons[0].text = 'US ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+            elif event.data == b'cb_us':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[1].buttons[0].text[-1] == '✅':
+                    markup.rows[1].buttons[0].text = 'US'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[1].buttons[0].text = 'US ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                                
-        await event.answer(status)
+                await msg.edit(buttons=markup) 
+                                                                                        
+                await event.answer(status)
 
-    elif event.data == b'cb_business':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[1].buttons[1].text[-1] == '✅':
-            markup.rows[1].buttons[1].text = 'Business'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[1].buttons[1].text = 'Business ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+            elif event.data == b'cb_business':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[1].buttons[1].text[-1] == '✅':
+                    markup.rows[1].buttons[1].text = 'Business'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[1].buttons[1].text = 'Business ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                                
-        await event.answer(status)  
+                await msg.edit(buttons=markup) 
+                                                                                        
+                await event.answer(status)  
 
-    elif event.data == b'cb_health':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[2].buttons[0].text[-1] == '✅':
-            markup.rows[2].buttons[0].text = 'Health'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[2].buttons[0].text = 'Health ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+            elif event.data == b'cb_health':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[2].buttons[0].text[-1] == '✅':
+                    markup.rows[2].buttons[0].text = 'Health'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[2].buttons[0].text = 'Health ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                              
-        await event.answer(status)  
-    
-    elif event.data == b'cb_entertainment':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[2].buttons[1].text[-1] == '✅':
-            markup.rows[2].buttons[1].text = 'Entertainment'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[2].buttons[1].text = 'Entertainment ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+                await msg.edit(buttons=markup) 
+                                                                                    
+                await event.answer(status)  
+            
+            elif event.data == b'cb_entertainment':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[2].buttons[1].text[-1] == '✅':
+                    markup.rows[2].buttons[1].text = 'Entertainment'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[2].buttons[1].text = 'Entertainment ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                                
-        await event.answer(status)  
-        
-    elif event.data == b'cb_sci_tech':
-        msg    = await event.get_message()
-        markup = msg.reply_markup
-        status = ''
-        if markup.rows[3].buttons[0].text[-1] == '✅':
-            markup.rows[3].buttons[0].text = 'Science & Tech'
-            status = CATEGORY_RM_MSG
-            # new_user.selected_categories.remove(event.data[3:])
-        else:
-            markup.rows[3].buttons[0].text = 'Science & Tech ✅'
-            status = CATEGORY_ADD_MSG
-            # new_user.selected_categories.append(event.data[3:])
+                await msg.edit(buttons=markup) 
+                                                                                        
+                await event.answer(status)  
+                
+            elif event.data == b'cb_sci_tech':
+                msg    = await event.get_message()
+                markup = msg.reply_markup
+                status = ''
+                if markup.rows[3].buttons[0].text[-1] == '✅':
+                    markup.rows[3].buttons[0].text = 'Science & Tech'
+                    status = CATEGORY_RM_MSG
+                    # new_user.selected_categories.remove(event.data[3:])
+                else:
+                    markup.rows[3].buttons[0].text = 'Science & Tech ✅'
+                    status = CATEGORY_ADD_MSG
+                    # new_user.selected_categories.append(event.data[3:])
 
-        await msg.edit(buttons=markup) 
-                                                                                
-        await event.answer(status)  
+                await msg.edit(buttons=markup) 
+                                                                                        
+                await event.answer(status)  
 
-    else:
-        await event.answer('Got the news!')
+            else:
+                await event.answer('Got the news!')
 
     # #Add new user to the list
     # if call.message.chat.id not in id_list:
