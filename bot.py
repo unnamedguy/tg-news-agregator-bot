@@ -65,6 +65,22 @@ async def send_welcome(event):
 async def send_categories(event):
     await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard(event.chat_id))
 
+@bot.on(events.NewMessage(chats=[1724712563]))
+async def client_handler(event):
+    msg = event.message.message.split('\n')[0]
+    ctg = get_en_news_category(msg)
+
+    with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
+        with conn.cursor() as cursor:
+            conn.autocommit = True
+            cursor.execute(f'SELECT chat_id FROM bot_user WHERE {ctg} = TRUE')
+            sub_users = cursor.fetchall()
+
+            # for id in sub_users:
+            #     bot.forward_messages(id, event.message)
+            print(sub_users)
+
+
 
 # Handles buttons' clicks
 @bot.on(events.CallbackQuery)
