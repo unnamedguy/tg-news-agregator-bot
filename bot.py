@@ -36,12 +36,13 @@ def create_keyboard(chat_id):
         with conn.cursor() as cursor:
             conn.autocommit = True
             cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {chat_id}')
-
+    user_entry = cursor.fetchall()
+    ctgrs = [' ✅' for i in range(0, 6) if user_entry[0][i]==True else '']
     keyboard = [
-        [Button.inline('Sport', 'cb_sport'), Button.inline('World', 'cb_world')],
-        [Button.inline('US', 'cb_us'), Button.inline('Business', 'cb_business')],
-        [Button.inline('Health', 'cb_health'), Button.inline('Entertainment', 'cb_entertainment')],
-        [Button.inline('Science & Tech', 'cb_sci_tech')],
+        [Button.inline(f'Sport{ctgrs[0]}', 'cb_sport'), Button.inline(f'World{ctgrs[1]}', 'cb_world')],
+        [Button.inline(f'US{ctgrs[2]}', 'cb_us'), Button.inline(f'Business{ctgrs[3]}', 'cb_business')],
+        [Button.inline(f'Health{ctgrs[4]}', 'cb_health'), Button.inline(f'Entertainment{ctgrs[5]}', 'cb_entertainment')],
+        [Button.inline(f'Science & Tech{ctgrs[6]}', 'cb_sci_tech')],
         [Button.inline('Get news', 'cb_getnews')]
     ]
     return keyboard
@@ -55,13 +56,9 @@ async def send_welcome(event):
             conn.autocommit = True
             cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')
             user_entry = cursor.fetchall()
-            print(user_entry)
             if len(user_entry)==0:
                 cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,us, business, health, entertainment, sci_tech)\
                 VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
-            else:
-               print(user_entry)
-
     await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard(event.chat_id))
 
 @bot.on(events.NewMessage(pattern='/categories'))
