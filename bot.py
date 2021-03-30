@@ -88,150 +88,37 @@ async def handler(event):
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
             conn.autocommit = True
-    # User initialization
-    # new_user = User(event.chat_id)
-            if event.data == b'cb_sport':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[0].buttons[0].text[-1] == '✅':
-                    markup.rows[0].buttons[0].text = 'Sport'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET sport = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[0].buttons[0].text = 'Sport ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET sport = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-                
-                await msg.edit(buttons=markup)
-
-                await event.answer(status)    
-
-            elif event.data == b'cb_world':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[0].buttons[1].text[-1] == '✅':
-                    markup.rows[0].buttons[1].text = 'World'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET world = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[0].buttons[1].text = 'World ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET world = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-
-                await msg.edit(buttons=markup) 
-                                                                                        
-                await event.answer(status)  
-
-            elif event.data == b'cb_us':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[1].buttons[0].text[-1] == '✅':
-                    markup.rows[1].buttons[0].text = 'US'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET us = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[1].buttons[0].text = 'US ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET us = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-
-                await msg.edit(buttons=markup) 
-                                                                                        
-                await event.answer(status)
-
-            elif event.data == b'cb_business':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[1].buttons[1].text[-1] == '✅':
-                    markup.rows[1].buttons[1].text = 'Business'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET business = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[1].buttons[1].text = 'Business ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET business = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-
-                await msg.edit(buttons=markup) 
-                                                                                        
-                await event.answer(status)  
-
-            elif event.data == b'cb_health':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[2].buttons[0].text[-1] == '✅':
-                    markup.rows[2].buttons[0].text = 'Health'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET health = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[2].buttons[0].text = 'Health ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET health = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-
-                await msg.edit(buttons=markup) 
-                                                                                    
-                await event.answer(status)  
             
-            elif event.data == b'cb_entertainment':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[2].buttons[1].text[-1] == '✅':
-                    markup.rows[2].buttons[1].text = 'Entertainment'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET entertainment = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[2].buttons[1].text = 'Entertainment ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET entertainment = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
+            btns = {b'cb_sport'        : 'Sport',
+                    b'cb_world'        : 'World',
+                    b'cb_us'           : 'US',
+                    b'cb_business'     : 'Business',
+                    b'cb_health'       : 'Health',
+                    b'cb_entertainment': 'Entertainment',
+                    b'cb_sci_tech'     : 'Science & Tech'}
+            
+            pos = 0
+            for key, name in btns:
+                if event.data == i:
+                    msg    = await event.get_message()
+                    markup = msg.reply_markup
+                    status = ''
+                    if markup.rows[pos//2].buttons[pos%2].text[-1] == '✅':
+                        markup.rows[pos//2].buttons[pos%2].text = name
+                        status = CATEGORY_RM_MSG
+                        cursor.execute(f'UPDATE bot_user SET {key[3:]} = FALSE WHERE chat_id = {event.chat_id}')
+                    else:
+                        markup.rows[pos//2].buttons[pos%2].text = f'{name} ✅'
+                        status = CATEGORY_ADD_MSG
+                        cursor.execute(f'UPDATE bot_user SET {key[3:]} = TRUE WHERE chat_id = {event.chat_id}')
+                    
+                    await msg.edit(buttons=markup)
 
-                await msg.edit(buttons=markup) 
-                                                                                        
-                await event.answer(status)  
-                
-            elif event.data == b'cb_sci_tech':
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                status = ''
-                if markup.rows[3].buttons[0].text[-1] == '✅':
-                    markup.rows[3].buttons[0].text = 'Science & Tech'
-                    status = CATEGORY_RM_MSG
-                    cursor.execute(f'UPDATE bot_user SET sci_tech = FALSE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.remove(event.data[3:])
-                else:
-                    markup.rows[3].buttons[0].text = 'Science & Tech ✅'
-                    status = CATEGORY_ADD_MSG
-                    cursor.execute(f'UPDATE bot_user SET sci_tech = TRUE WHERE chat_id = {event.chat_id}')
-                    # new_user.selected_categories.append(event.data[3:])
-
-                await msg.edit(buttons=markup) 
-                                                                                        
-                await event.answer(status)  
-
-            else:
-                await event.answer('Got the news!')
-
-    # #Add new user to the list
-    # if call.message.chat.id not in id_list:
-    #     new_user.subscribed = True #start sending news
-    #     id_list.append(new_user.chat_id)
-    #     user_list.append(new_user)
-
+                    await event.answer(status)
+                pos += 1
+            
+            if pos >= 7:
+                await event.respond("Done! I'll keep you up to date!")
 
 client.run_until_disconnected()
 bot.run_until_disconnected()        
