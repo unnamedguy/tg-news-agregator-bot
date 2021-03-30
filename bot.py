@@ -58,7 +58,7 @@ async def send_welcome(event):
           What kind of news would you like to receive?", buttons=create_keyboard())
 
 @bot.on(events.NewMessage(pattern='/categories'))
-async def send_welcome(event):
+async def send_categories(event):
     await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard())
 
 
