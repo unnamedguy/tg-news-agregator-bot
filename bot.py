@@ -1,18 +1,21 @@
 import configparser
-
+import psycopg2
+from dbconfig import *
 from apitok import API_TOKEN
 from classifier import get_en_news_category
 from telethon.tl.functions.channels import JoinChannelRequest
 from telethon.tl.custom import Button
 from user import User
-
 from telethon import events, TelegramClient
+from contextlib import closing
 
+conn = psycopg2.connect(dbname=DB_NAME, user=USER, 
+                        password=PASS, host=HOST)
+cursor = conn.cursor()
+
+table = 'bot'
 config = configparser.ConfigParser()
-config.read("config.ini")
-
-user_list = []
-id_list = []
+config.read('config.ini')
 
 CATEGORY_ADD_MSG = 'Category added!'
 CATEGORY_RM_MSG  = 'Category removed!'
@@ -45,11 +48,18 @@ def create_keyboard():
 # Welcome message
 @bot.on(events.NewMessage(pattern='/start'))
 async def send_welcome(event):
-    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard())
+    with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,\
+                            us, business, health, entertainment, sci_tech)\
+                            VALUES ({event.chat_id}, f, f, f, f, f, f, f)')
+
+    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot.\
+          What kind of news would you like to receive?", buttons=create_keyboard())
 
 @bot.on(events.NewMessage(pattern='/categories'))
 async def send_welcome(event):
-    await bot.send_message(event.chat_id, "Here are the categories:", buttons=create_keyboard())
+    await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard())
 
 
 # Handles buttons' clicks
