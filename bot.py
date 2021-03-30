@@ -34,7 +34,12 @@ bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN
 #     await event.reply('aa')
 
 # Keyboard generation
-def create_keyboard():
+def create_keyboard(chat_id):
+    with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
+        with conn.cursor() as cursor:
+            conn.autocommit = True
+            user_entry = cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {chat_id}')
+
     keyboard = [
         [Button.inline('Sport', 'cb_sport'), Button.inline('World', 'cb_world')],
         [Button.inline('US', 'cb_us'), Button.inline('Business', 'cb_business')],
@@ -60,11 +65,11 @@ async def send_welcome(event):
                             
 
 
-    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard())
+    await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard(event.chat_id))
 
 @bot.on(events.NewMessage(pattern='/categories'))
 async def send_categories(event):
-    await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard())
+    await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard(event.chat_id))
 
 
 # Handles buttons' clicks
