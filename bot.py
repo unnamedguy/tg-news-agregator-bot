@@ -1,4 +1,3 @@
-import telebot
 import configparser
 
 from apitok import API_TOKEN
