@@ -76,9 +76,8 @@ async def client_handler(event):
             cursor.execute(f'SELECT chat_id FROM bot_user WHERE {ctg} = TRUE')
             sub_users = cursor.fetchall()
 
-            # for id in sub_users:
-            #     bot.forward_messages(id, event.message)
-            print(sub_users)
+            for user in sub_users:
+                await bot.forward_messages(user[0], event.message)
 
 
 
@@ -98,8 +97,9 @@ async def handler(event):
                     b'cb_sci_tech'     : 'Science & Tech'}
             
             pos = 0
-            for key, name in btns:
-                if event.data == i:
+            for key, name in btns.items():
+                if event.data == key:
+                    key = key.decode('UTF-8')
                     msg    = await event.get_message()
                     markup = msg.reply_markup
                     status = ''
@@ -115,6 +115,7 @@ async def handler(event):
                     await msg.edit(buttons=markup)
 
                     await event.answer(status)
+                    break
                 pos += 1
             
             if pos >= 7:
