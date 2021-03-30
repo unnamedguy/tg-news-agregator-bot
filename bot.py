@@ -9,10 +9,6 @@ from user import User
 from telethon import events, TelegramClient
 from contextlib import closing
 
-# conn = psycopg2.connect(dbname=DB_NAME, user=USER, 
-#                         password=PASS, host=HOST)
-# cursor = conn.cursor()
-
 table = 'bot'
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -32,13 +28,14 @@ bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN
 # @client.on(events.NewMessage)
 # async def handler(event):
 #     await event.reply('aa')
+#'SELECT chat_id FROM bot_user WHERE {category} = TRUE'
 
 # Keyboard generation
 def create_keyboard(chat_id):
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
             conn.autocommit = True
-            user_entry = cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {chat_id}')
+            cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {chat_id}')
 
     keyboard = [
         [Button.inline('Sport', 'cb_sport'), Button.inline('World', 'cb_world')],
@@ -56,12 +53,14 @@ async def send_welcome(event):
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
             conn.autocommit = True
-            user_entry = cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')
-            if user_entry=='None':
+            cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')
+            user_entry = cursor.fetchall()
+            print(user_entry)
+            if user_entry==None:
                 cursor.execute(f'INSERT INTO bot_user(chat_id, sport, world,us, business, health, entertainment, sci_tech)\
                 VALUES ({event.chat_id}, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)')
-            else:
-                print(user_entry)
+            #else:
+               # print(user_entry)
 
     await bot.send_message(event.chat_id, "Hello! I'm CoolstoryBot. What kind of news would you like to receive?", buttons=create_keyboard(event.chat_id))
 
