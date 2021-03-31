@@ -24,8 +24,7 @@ username = config['Telegram']['username']
 client = TelegramClient(username, api_id, api_hash).start()
 
 bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN)
-# -1001317428262
-@client.on(events.NewMessage(chats=[165878449]))
+@client.on(events.NewMessage(chats=[-1001317428262]))
 async def handler(event):
     await client.forward_messages(1436454776, event.message)
 
