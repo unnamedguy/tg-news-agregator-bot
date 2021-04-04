@@ -83,7 +83,7 @@ async def send_categories(event):
     if len(user_entry) == 0:
         return
     en_msg = 'Here are the categories:'
-    ru_msg = "Меню выбора категорий:"
+    ru_msg = 'Меню выбора категорий:'
     if user_entry[0][9]:       
         await bot.send_message(event.chat_id, en_msg, buttons=create_keyboard(event.chat_id))
     else:
@@ -148,9 +148,17 @@ async def keyboard_handler(event):
                 pos += 1
             
             if pos >= 7:
+                if len(msg.text)<30: 
+                    header = 'Меню выбора категорий:' if lang else 'Here are the categories:'
+                else:
+                    if lang:
+                        header = 'Привет! Я КулСториБот. Какие новости ты хочешь получать?'
+                    else:
+                        header = "Hello! I'm CoolstoryBot. What kind of news would you like to receive?"
+                
                 lang = 'TRUE' if btn_text=='Сменить на английский' else 'FALSE'
                 cursor.execute(f'UPDATE bot_user SET lang = {lang} WHERE chat_id = {event.chat_id}')
-                await msg.edit(buttons=create_keyboard(event.chat_id), text = 'Начать взаимодействие')
+                await msg.edit(buttons=create_keyboard(event.chat_id), text = header)
 
 client.run_until_disconnected()
 bot.run_until_disconnected()        
