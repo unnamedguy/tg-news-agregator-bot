@@ -10,7 +10,7 @@ from contextlib import closing
 client = TelegramClient(username, api_id, api_hash).start()
 bot = TelegramClient('CoolStoryBot', api_id, api_hash).start(bot_token=API_TOKEN)
 
-@client.on(events.NewMessage(chats=[BBC_ID]))
+@client.on(events.NewMessage(chats=[BBC_ID, MEDUZA_ID]))
 async def news_handler(event):
     await client.forward_messages(BOT_ID, event.message)
 
@@ -71,7 +71,7 @@ async def send_welcome(event):
                     await bot.send_message(event.chat_id, en_welcome, buttons=create_keyboard(event.chat_id))
                 else:
                     await bot.send_message(event.chat_id, ru_welcome, buttons=create_keyboard(event.chat_id))
-
+            
 # Handle '/categories'
 @bot.on(events.NewMessage(pattern='/categories'))
 async def send_categories(event):
@@ -92,21 +92,23 @@ async def send_categories(event):
 # Handle incoming news 
 @bot.on(events.NewMessage(chats=[CLIENT_ID]))
 async def client_handler(event):
-    from_id = event.message.fwd_from.from_id
-    msg = event.message.message.text.split('\n')[0]
-
+    from_id = int('-100' + str(event.message.fwd_from.from_id.channel_id))
+    msg = event.message.message.split('\n')[0] 
+    ctg = ''
+    lang = False
     if from_id==BBC_ID:
+        lang = True
         ctg = get_en_news_category(msg) 
     elif from_id==MEDUZA_ID:
         ctg = get_ru_news_category(msg)
-
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
             conn.autocommit = True
-            cursor.execute(f'SELECT chat_id FROM bot_user WHERE {ctg} = TRUE')
+            cursor.execute(f'SELECT chat_id, lang FROM bot_user WHERE {ctg} = TRUE')
             sub_users = cursor.fetchall()
             for user in sub_users:
-                await bot.forward_messages(user[0], event.message)
+                if lang == user[1]:
+                    await bot.forward_messages(user[0], event.message)
 
 
 # Handle button clicks

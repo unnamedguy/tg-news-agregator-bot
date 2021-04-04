@@ -18,7 +18,7 @@ def get_en_news_category(headline):
     return category_list[predicted[0]]
 
 def get_ru_news_category(headline):
-    category_list = ['Бизнес', 'Интернет и СМИ', 'Культура', 'Мир', 'Наука и техника', 'Россия', 'Спорт']
+    category_list = ['business', 'internet', 'entertainment', 'world', 'sci_tech', 'ru', 'sport']
 
     docs_new = [headline]
 
