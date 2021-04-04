@@ -115,9 +115,14 @@ async def keyboard_handler(event):
     with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
         with conn.cursor() as cursor:
             conn.autocommit = True
+            msg    = await event.get_message()
+            markup = msg.reply_markup
+            btn_text = markup.rows[4].buttons[0].text
+            lang = False if btn_text=='Сменить на английский' else True
+            cb_var = ['cb_ru', 'cb_internet'] if not lang else ['cb_us', 'cb_health']
 
-            btns = [b'cb_sport', b'cb_world', b'cb_us', b'cb_business', b'cb_health', 
-                    b'cb_entertainment', b'cb_sci_tech', b'cb_ru', b'cb_internet']
+            btns = [b'cb_sport', b'cb_world', b'{}'.format(cb_var[0]), b'cb_business', b'{}'.format(cb_var[1]), 
+                    b'cb_entertainment', b'cb_sci_tech']
 
             pos = 0
             for i in range(0, 7):
@@ -140,11 +145,9 @@ async def keyboard_handler(event):
 
                     await event.answer(status)
                     break
-                pos += 1 
+                pos += 1
+            
             if pos >= 7:
-                msg    = await event.get_message()
-                markup = msg.reply_markup
-                btn_text = markup.rows[4].buttons[0].text
                 lang = 'TRUE' if btn_text=='Сменить на английский' else 'FALSE'
                 cursor.execute(f'UPDATE bot_user SET lang = {lang} WHERE chat_id = {event.chat_id}')
                 await msg.edit(buttons=create_keyboard(event.chat_id))
