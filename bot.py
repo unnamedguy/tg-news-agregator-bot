@@ -82,12 +82,12 @@ async def send_categories(event):
             user_entry = cursor.fetchall()
     if len(user_entry) == 0:
         return
-    en_welcome = 'Here are the categories:'
-    ru_welcome = "Меню выбора категорий:"
+    en_msg = 'Here are the categories:'
+    ru_msg = "Меню выбора категорий:"
     if user_entry[0][9]:       
-        await bot.send_message(event.chat_id, en_welcome, buttons=create_keyboard(event.chat_id))
+        await bot.send_message(event.chat_id, en_msg, buttons=create_keyboard(event.chat_id))
     else:
-        await bot.send_message(event.chat_id, ru_welcome, buttons=create_keyboard(event.chat_id))
+        await bot.send_message(event.chat_id, ru_msg, buttons=create_keyboard(event.chat_id))
 
 # Handle incoming news 
 @bot.on(events.NewMessage(chats=[CLIENT_ID]))
@@ -119,9 +119,9 @@ async def keyboard_handler(event):
             markup = msg.reply_markup
             btn_text = markup.rows[4].buttons[0].text
             lang = False if btn_text=='Сменить на английский' else True
-            cb_var = ['cb_ru', 'cb_internet'] if not lang else ['cb_us', 'cb_health']
+            cb_var = [b'cb_ru', b'cb_internet'] if not lang else [b'cb_us', b'cb_health']
 
-            btns = [b'cb_sport', b'cb_world', b'{}'.format(cb_var[0]), b'cb_business', b'{}'.format(cb_var[1]), 
+            btns = [b'cb_sport', b'cb_world', cb_var[0], b'cb_business', cb_var[1], 
                     b'cb_entertainment', b'cb_sci_tech']
 
             pos = 0
@@ -150,7 +150,7 @@ async def keyboard_handler(event):
             if pos >= 7:
                 lang = 'TRUE' if btn_text=='Сменить на английский' else 'FALSE'
                 cursor.execute(f'UPDATE bot_user SET lang = {lang} WHERE chat_id = {event.chat_id}')
-                await msg.edit(buttons=create_keyboard(event.chat_id))
+                await msg.edit(buttons=create_keyboard(event.chat_id), text = 'Начать взаимодействие')
 
 client.run_until_disconnected()
 bot.run_until_disconnected()        
