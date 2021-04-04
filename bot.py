@@ -31,7 +31,7 @@ def create_keyboard(chat_id):
             cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {chat_id}')
             user_entry = cursor.fetchall()
 
-    layout = [value for value in btns.values()] if user_entry[0][8] else [key for key in btns.keys()]
+    layout = [value for value in btns.values()] if user_entry[0][9] else [key for key in btns.keys()]
     for i in range(0, 7):
         if user_entry[0][i]==True:
             layout[i] += ' ✅'
@@ -64,7 +64,7 @@ async def send_welcome(event):
             user_entry = cursor.fetchall()
             if len(user_entry)==0:
                 cursor.execute(f'INSERT INTO bot_user(sport, world, us, business, health, entertainment, sci_tech, ru, internet, lang, chat_id)\
-                VALUES (FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, {event.chat_id},)')
+                VALUES (FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, {event.chat_id})')
                 await bot.send_message(event.chat_id, ru_welcome, buttons=create_keyboard(event.chat_id))
             else:
                 if user_entry[0][9]:
@@ -75,7 +75,19 @@ async def send_welcome(event):
 # Handle '/categories'
 @bot.on(events.NewMessage(pattern='/categories'))
 async def send_categories(event):
-    await bot.send_message(event.chat_id, 'Here are the categories:', buttons=create_keyboard(event.chat_id))
+    with closing(psycopg2.connect(dbname=DB_NAME, user=USER, password=PASS, host=HOST)) as conn:
+        with conn.cursor() as cursor:
+            conn.autocommit = True
+            cursor.execute(f'SELECT * FROM bot_user WHERE chat_id = {event.chat_id}')
+            user_entry = cursor.fetchall()
+    if len(user_entry) == 0:
+        return
+    en_welcome = 'Here are the categories:'
+    ru_welcome = "Меню выбора категорий:"
+    if user_entry[0][9]:       
+        await bot.send_message(event.chat_id, en_welcome, buttons=create_keyboard(event.chat_id))
+    else:
+        await bot.send_message(event.chat_id, ru_welcome, buttons=create_keyboard(event.chat_id))
 
 # Handle incoming news 
 @bot.on(events.NewMessage(chats=[CLIENT_ID]))
@@ -106,10 +118,11 @@ async def keyboard_handler(event):
 
             btns = [b'cb_sport', b'cb_world', b'cb_us', b'cb_business', b'cb_health', 
                     b'cb_entertainment', b'cb_sci_tech', b'cb_ru', b'cb_internet']
+
             pos = 0
-            for key in btns:
-                if event.data == key:
-                    key = key.decode('UTF-8')
+            for i in range(0, 7):
+                if event.data == btns[i]:
+                    key = btns[i].decode('UTF-8')
                     msg    = await event.get_message()
                     markup = msg.reply_markup
                     status = ''
@@ -129,6 +142,8 @@ async def keyboard_handler(event):
                     break
                 pos += 1 
             if pos >= 7:
+                msg    = await event.get_message()
+                markup = msg.reply_markup
                 btn_text = markup.rows[4].buttons[0].text
                 lang = 'TRUE' if btn_text=='Сменить на английский' else 'FALSE'
                 cursor.execute(f'UPDATE bot_user SET lang = {lang} WHERE chat_id = {event.chat_id}')
